@@ -53,10 +53,11 @@ public class Menu {
 		System.out.println("Você entrou no método Inclui.");
 	}
 
-	public static void ModoClient() throws NoSuchAlgorithmException, IOException {
+	public static void ModoClient() throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
 		ClientController clientService = new ClientController();
 		clientService.startClient();
 		System.out.println("Você entrou no método Altera.");
+		System.exit(0);
 	}
 
 	@SuppressWarnings("resource")

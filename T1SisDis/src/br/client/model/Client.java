@@ -1,12 +1,14 @@
 package br.client.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.model.File;
 
-public class Client {
+public class Client implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private String ip;
 	private List<File> listFiles;
 	
