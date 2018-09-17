@@ -20,43 +20,17 @@ public class Menu {
 	@SuppressWarnings("resource")
 	public static void ModoServidor() throws IOException, ClassNotFoundException {
 		ServerController serverService = new ServerController();
-		int opcao;
-		
-		do {
-			System.out.println("Digite a porta do servidor: ");
-			Scanner inputPorta = new Scanner(System.in);
-			serverService.startServer(inputPorta.nextInt());
-			
-			Scanner inputOpcao = new Scanner(System.in);
-			
-			opcao = inputOpcao.nextInt();
-		}
-		while (opcao != 0);
-		
-//		ServerSocket listener = new ServerSocket(9090);
-//        try {
-//            while (true) {
-//                Socket socket = listener.accept();
-//                try {
-//                    PrintWriter out =
-//                        new PrintWriter(socket.getOutputStream(), true);
-//                    out.println(new Date().toString());
-//                } finally {
-//                    socket.close();
-//                }
-//            }
-//        }
-//        finally {
-//            listener.close();
-//        }
-		
-		System.out.println("Você entrou no método Inclui.");
+
+		System.out.println("Digite a porta do servidor: ");
+		Scanner inputPorta = new Scanner(System.in);
+		serverService.startServer(inputPorta.nextInt());
+		System.exit(0);
 	}
 
 	public static void ModoClient() throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
 		ClientController clientService = new ClientController();
 		clientService.startClient();
-		System.out.println("Você entrou no método Altera.");
+		System.out.println("Até logo!");
 		System.exit(0);
 	}
 

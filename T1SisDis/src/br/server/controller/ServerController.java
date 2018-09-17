@@ -53,6 +53,7 @@ public class ServerController {
 
 	public void startServer(int porta) throws IOException, ClassNotFoundException {
 
+		@SuppressWarnings("resource")
 		ServerSocket serverSocket = new ServerSocket(porta);
 		System.out.println("Servidor iniciado na porta: " + porta);
 
@@ -73,7 +74,6 @@ public class ServerController {
 				t.start();
 
 			} catch (IOException ex) {
-				serverSocket.close();
 				clienteSocket.close();
 				Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
 			}

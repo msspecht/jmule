@@ -14,6 +14,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.plaf.synth.SynthSeparatorUI;
@@ -22,69 +23,133 @@ import br.client.model.Client;
 import br.util.HashMD5;
 
 public class ClientController {
+	
+	public static void menu() {
+		System.out.println("\n-----------------------------");
+		System.out.println("\tMenu");
+		System.out.println("0 - Fim");
+		System.out.println("1 - Listar recursos");
+		System.out.println("2 - Baixar arquivos");
+		System.out.println("Opcao:");
+	}
 
 	@SuppressWarnings("resource")
 	public void startClient() throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
 		
+		Scanner readInput = new Scanner(System.in);
+		
 		System.out.println("Digite o endereco do servidor: ");
-		Scanner ipServidor = new Scanner(System.in);
+		String ipServidor = readInput.nextLine();
 		
 		System.out.println("Digite a porta do servidor: ");
-		Scanner porta = new Scanner(System.in);
+		int porta = readInput.nextInt();
 		
 		Socket socket;
 		
 		try {
-					
-			socket = new Socket(ipServidor.nextLine(), porta.nextInt());
+			socket = new Socket(ipServidor, porta);
+			
+			System.out.println("\nBem vindo ao JMule - Client");
 			
 			// Envio de objeto
 			ObjectOutputStream enviaObjeto = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream recebeObjeto = new ObjectInputStream(socket.getInputStream());
+			Map<String, Client> map;
 			
+			enviaObjeto.writeObject(createClient());
+			enviaObjeto.flush();
+			enviaObjeto.reset();
 			
-			Scanner teclado = new Scanner(System.in);
-			
-			while (true) {
-				System.out.println("Digite Exit para sair!");
-				
-				enviaObjeto.writeObject(createClient());
-				enviaObjeto.flush();
-				
-				if (teclado.nextLine().equalsIgnoreCase("Exit")) {
+			int opcao;
+			Scanner entrada = new Scanner(System.in);
+
+			do {
+
+				menu();
+				opcao = entrada.nextInt();
+
+				switch (opcao) {
+
+				case 0:
+					enviaObjeto.writeObject(opcao);
+					enviaObjeto.flush();
+					enviaObjeto.reset();
+
 					System.out.println("Fechando conexões");
 					socket.close();
 					System.out.println("Conexão fechada");
 					break;
+
+				case 1:
+					enviaObjeto.writeObject(opcao);
+					enviaObjeto.flush();
+					enviaObjeto.reset();
+
+					Object objetoClient = recebeObjeto.readObject();
+					if (objetoClient != null && objetoClient instanceof Map) {
+						map = (Map<String, Client>) objetoClient;
+						if (!map.isEmpty()) {
+							for (Map.Entry<String, Client> entry : map.entrySet()) {
+								System.out.println("Lista retorno: --- " + entry.getValue().getIp());
+
+							}
+						}
+					}
+					break;
+
+				case 2:
+					
+					break;
+
+				default:
+					System.out.println("Opção inválida.");
 				}
-				
-//				Client clienteEnviar = new Client();
-//				clienteEnviar = createClient();
-//				enviaObjeto.writeObject(clienteEnviar);
-				
+			} while(opcao!=0);
+			
+			
+//			Scanner teclado = new Scanner(System.in);
+//
+//			System.out.println("Digite Exit para sair!");
+//
+//			while (teclado.hasNextLine()) {
+//				String toSend = teclado.nextLine();
+//
+//				if (toSend.equalsIgnoreCase("Exit")) {
+//					// Envia Objeto (String)
+//					enviaObjeto.writeObject(toSend);
+//					enviaObjeto.flush();
+//					enviaObjeto.reset();
+//
+//					System.out.println("Fechando conexões");
+//					socket.close();
+//					System.out.println("Conexão fechada");
+//					break;
+//				}
+//
+//				// Envia Objeto
 //				enviaObjeto.writeObject(createClient());
 //				enviaObjeto.flush();
-				
-//				Client to = (Client) recebeObjeto.readObject();
-//				if (to != null) {
-//					System.out.println(to.getIp());
+//				enviaObjeto.reset();
+//				System.out.println("Cliente Enviou Objeto");
+//
+//				// Recebe Objeto do tipo Map
+//				Object objetoClient = recebeObjeto.readObject();
+//				if (objetoClient != null && objetoClient instanceof Map) {
+//					map = (Map<String, Client>) objetoClient;
+//					if (!map.isEmpty()) {
+//						for (Map.Entry<String, Client> entry : map.entrySet()) {
+//							System.out.println("Lista retorno: --- " + entry.getValue().getIp());
+//
+//						}
+//					}
 //				}
-
-			}
-			
-			// Envio de mensagem
-//			PrintStream enviaServidor = new PrintStream(socket.getOutputStream(), true);
-//			Scanner retornoServer = new Scanner(socket.getInputStream());
-//			Scanner teclado = new Scanner(System.in);
-//			while (teclado.hasNextLine()) {
-//				enviaServidor.println(teclado.nextLine());
-//				System.out.println("Recebido servidor: "+retornoServer.next());
-//				showResouces();
+//
 //			}
+//			teclado.close();
+//			enviaObjeto.close();
+//			recebeObjeto.close();
 
-			teclado.close();
-			enviaObjeto.close();
-			recebeObjeto.close();
+			
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -93,7 +158,6 @@ public class ClientController {
 			e.printStackTrace();
 		}
 
-//		System.exit(0);
 	}
 	
 	public Client createClient() throws NoSuchAlgorithmException, IOException {
@@ -123,9 +187,6 @@ public class ClientController {
 			newFile.setHash(digest);
 			
 			listLocalFiles.add(newFile);
-			
-			System.out.println("MD5 Digest:" + digest);
-			System.out.println(arquivo.getName());
 		}
 
 		return listLocalFiles;
