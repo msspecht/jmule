@@ -90,7 +90,11 @@ public class ClientController {
 						map = (Map<String, Client>) objetoClient;
 						if (!map.isEmpty()) {
 							for (Map.Entry<String, Client> entry : map.entrySet()) {
-								System.out.println("Lista retorno: --- " + entry.getValue().getIp());
+								System.out.println("Lista retorno -> Cliente: --- " + entry.getValue().getIp());
+								
+								for (br.model.File f : entry.getValue().getListFiles()) {
+									System.out.println("\tArquivos -> \tNome: "+f.getNome()+"\tHASH: "+f.getHash());
+								}
 
 							}
 						}
