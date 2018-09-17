@@ -55,10 +55,10 @@ public class ServerController {
 
 		@SuppressWarnings("resource")
 		ServerSocket serverSocket = new ServerSocket(porta);
+		Socket clienteSocket = null;
 		System.out.println("Servidor iniciado na porta: " + porta);
 
 		while (true) {
-			Socket clienteSocket = null;
 
 			try {
 				clienteSocket = serverSocket.accept();
@@ -69,7 +69,7 @@ public class ServerController {
 				ObjectInputStream recebeObjeto = new ObjectInputStream(clienteSocket.getInputStream());
 				ObjectOutputStream enviaObjeto = new ObjectOutputStream(clienteSocket.getOutputStream());
 
-				Thread t = new ClientHandler(clienteSocket, recebeObjeto, enviaObjeto);
+				Thread t = new ClientHandler(clienteSocket, recebeObjeto, enviaObjeto, this);
 
 				t.start();
 
@@ -79,6 +79,14 @@ public class ServerController {
 			}
 
 		}
-
+		
+//		try {
+//			// closing resources
+//			clienteSocket.close();
+//			serverSocket.close();
+//
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 }

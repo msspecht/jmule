@@ -15,11 +15,11 @@ public class ClientHandler extends Thread {
 	final ObjectOutputStream enviaObjeto;
 	final Socket s;
 
-	public ClientHandler(Socket s, ObjectInputStream recebeObjeto, ObjectOutputStream enviaObjeto) {
+	public ClientHandler(Socket s, ObjectInputStream recebeObjeto, ObjectOutputStream enviaObjeto, ServerController serverService) {
 		this.s = s;
 		this.recebeObjeto = recebeObjeto;
 		this.enviaObjeto = enviaObjeto;
-		serverService = new ServerController();
+		this.serverService = serverService;
 	}
 
 	@Override

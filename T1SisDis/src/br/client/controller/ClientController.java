@@ -109,49 +109,6 @@ public class ClientController {
 					System.out.println("Opção inválida.");
 				}
 			} while(opcao!=0);
-			
-			
-//			Scanner teclado = new Scanner(System.in);
-//
-//			System.out.println("Digite Exit para sair!");
-//
-//			while (teclado.hasNextLine()) {
-//				String toSend = teclado.nextLine();
-//
-//				if (toSend.equalsIgnoreCase("Exit")) {
-//					// Envia Objeto (String)
-//					enviaObjeto.writeObject(toSend);
-//					enviaObjeto.flush();
-//					enviaObjeto.reset();
-//
-//					System.out.println("Fechando conexões");
-//					socket.close();
-//					System.out.println("Conexão fechada");
-//					break;
-//				}
-//
-//				// Envia Objeto
-//				enviaObjeto.writeObject(createClient());
-//				enviaObjeto.flush();
-//				enviaObjeto.reset();
-//				System.out.println("Cliente Enviou Objeto");
-//
-//				// Recebe Objeto do tipo Map
-//				Object objetoClient = recebeObjeto.readObject();
-//				if (objetoClient != null && objetoClient instanceof Map) {
-//					map = (Map<String, Client>) objetoClient;
-//					if (!map.isEmpty()) {
-//						for (Map.Entry<String, Client> entry : map.entrySet()) {
-//							System.out.println("Lista retorno: --- " + entry.getValue().getIp());
-//
-//						}
-//					}
-//				}
-//
-//			}
-//			teclado.close();
-//			enviaObjeto.close();
-//			recebeObjeto.close();
 
 			
 		} catch (UnknownHostException e) {
