@@ -24,69 +24,73 @@ public class ClientHandler extends Thread {
 
 	@Override
 	public void run() {
-		int received;
-		while (true) {
+		synchronized (serverService) {
+			
+			int received;
+			while (true) {
+
+				try {
+					Object objetoRetorno = recebeObjeto.readObject();
+
+					if (objetoRetorno instanceof Integer) {
+						received = ((Integer) objetoRetorno).intValue();
+
+						if (received == 0) {
+							System.out.println("Cliente " + this.s + " enviou exit...");
+							System.out.println("Fechando conexão.");
+							this.s.close();
+							System.out.println("Conexão Fechada");
+
+							// closing resources
+							this.recebeObjeto.close();
+							this.enviaObjeto.close();
+							break;
+						}
+
+						// write on output stream based on the answer from the client
+						switch (received) {
+
+						case 1:
+							for (Map.Entry<String, Client> entry : serverService.getClientRegister().entrySet()) {
+								entry.getValue();
+								Client value = entry.getValue();
+								System.out.println("Ip: " + value.getIp());
+							}
+							enviaObjeto.writeObject(serverService.getClientRegister());
+							break;
+
+						case 2:
+							break;
+
+						default:
+							enviaObjeto.writeUTF("Opção invalida");
+							break;
+						}
+					} else {
+						Client to = (Client) objetoRetorno;
+						if (to != null) {
+							serverService.clientRegister(to);
+							System.out.println("Clientes Registrados: " + to.getIp());
+						}
+					}
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 
 			try {
-				Object objetoRetorno = recebeObjeto.readObject();
-
-				if (objetoRetorno instanceof Integer) {
-					received = ((Integer) objetoRetorno).intValue();
-
-					if (received == 0) {
-						System.out.println("Cliente " + this.s + " enviou exit...");
-						System.out.println("Fechando conexão.");
-						this.s.close();
-						System.out.println("Conexão Fechada");
-
-						// closing resources
-						this.recebeObjeto.close();
-						this.enviaObjeto.close();
-						break;
-					}
-
-					// write on output stream based on the answer from the client
-					switch (received) {
-
-					case 1:
-						for (Map.Entry<String, Client> entry : serverService.getClientRegister().entrySet()) {
-							entry.getValue();
-							Client value = entry.getValue();
-							System.out.println("Ip: " + value.getIp());
-						}
-						enviaObjeto.writeObject(serverService.getClientRegister());
-						break;
-
-					case 2:
-						break;
-
-					default:
-						enviaObjeto.writeUTF("Opção invalida");
-						break;
-					}
-				} else {
-					Client to = (Client) objetoRetorno;
-					if (to != null) {
-						serverService.clientRegister(to);
-						System.out.println("Clientes Registrados: " + to.getIp());
-					}
-				}
+				// closing resources
+				this.recebeObjeto.close();
+				this.enviaObjeto.close();
 
 			} catch (IOException e) {
 				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
-
-		try {
-			// closing resources
-			this.recebeObjeto.close();
-			this.enviaObjeto.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
 	}
 }
