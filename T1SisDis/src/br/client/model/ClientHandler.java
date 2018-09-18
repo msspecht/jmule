@@ -4,13 +4,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Map;
 
 import br.server.controller.ServerController;
 
 public class ClientHandler extends Thread {
 
-	ServerController serverService;
+	final ServerController serverService;
 	final ObjectInputStream recebeObjeto;
 	final ObjectOutputStream enviaObjeto;
 	final Socket s;
@@ -24,7 +23,6 @@ public class ClientHandler extends Thread {
 
 	@Override
 	public void run() {
-		synchronized (serverService) {
 			
 			int received;
 			while (true) {
@@ -47,19 +45,14 @@ public class ClientHandler extends Thread {
 							break;
 						}
 
-						// write on output stream based on the answer from the client
 						switch (received) {
 
 						case 1:
-							for (Map.Entry<String, Client> entry : serverService.getClientRegister().entrySet()) {
-								entry.getValue();
-								Client value = entry.getValue();
-								System.out.println("Ip: " + value.getIp());
-							}
 							enviaObjeto.writeObject(serverService.getClientRegister());
 							break;
 
 						case 2:
+							
 							break;
 
 						default:
@@ -70,7 +63,6 @@ public class ClientHandler extends Thread {
 						Client to = (Client) objetoRetorno;
 						if (to != null) {
 							serverService.clientRegister(to);
-							System.out.println("Clientes Registrados: " + to.getIp());
 						}
 					}
 
@@ -90,7 +82,7 @@ public class ClientHandler extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+//		}
 		
 	}
 }

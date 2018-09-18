@@ -1,13 +1,14 @@
 package br.client.controller;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
@@ -16,13 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-
-import javax.swing.plaf.synth.SynthSeparatorUI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import br.client.model.Client;
+import br.server.model.Server;
 import br.util.HashMD5;
 
 public class ClientController {
+	final static int TRANSFER_PORT = 3220;
 	
 	public static void menu() {
 		System.out.println("\n-----------------------------");
@@ -48,6 +51,9 @@ public class ClientController {
 		
 		try {
 			socket = new Socket(ipServidor, porta);
+			
+			// Escutando para receber arquivos
+			listenTransferFile();
 			
 			System.out.println("\nBem vindo ao JMule - Client");
 			
@@ -90,12 +96,12 @@ public class ClientController {
 						map = (Map<String, Client>) objetoClient;
 						if (!map.isEmpty()) {
 							for (Map.Entry<String, Client> entry : map.entrySet()) {
-								System.out.println("Lista retorno -> Cliente: --- " + entry.getValue().getIp());
-								
-								for (br.model.File f : entry.getValue().getListFiles()) {
-									System.out.println("\tArquivos -> \tNome: "+f.getNome()+"\tHASH: "+f.getHash());
-								}
+								System.out.println("Lista de Recursos -> Cliente: --- " + entry.getValue().getIp());
 
+								for (br.model.File f : entry.getValue().getListFiles()) {
+									System.out
+											.println("\tArquivos -> \tNome: " + f.getNome() + "\tHASH: " + f.getHash());
+								}
 							}
 						}
 					}
@@ -108,7 +114,7 @@ public class ClientController {
 				default:
 					System.out.println("Opção inválida.");
 				}
-			} while(opcao!=0);
+			} while (opcao != 0);
 
 			
 		} catch (UnknownHostException e) {
@@ -151,5 +157,63 @@ public class ClientController {
 		}
 
 		return listLocalFiles;
+	}
+	
+	private void listenTransferFile() {
+		ServerSocket serverSocket;
+		try {
+			
+			serverSocket = new ServerSocket(TRANSFER_PORT);
+			Socket clienteSocket = null;
+			System.out.println("Servidor iniciado na porta: " + TRANSFER_PORT);
+			
+			while (true) {
+
+				try {
+					clienteSocket = serverSocket.accept();
+
+					System.out.println("Cliente do IP " + clienteSocket.getInetAddress().getHostAddress() + " conectado.");
+					
+					saveFile(clienteSocket);
+
+//					// Recebimento de Objeto
+//					ObjectInputStream recebeObjeto = new ObjectInputStream(clienteSocket.getInputStream());
+//					ObjectOutputStream enviaObjeto = new ObjectOutputStream(clienteSocket.getOutputStream());
+//					
+//					Thread t = new ClientHandler(clienteSocket, recebeObjeto, enviaObjeto, this);
+//
+//					t.start();
+
+				} catch (IOException ex) {
+					clienteSocket.close();
+					Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+				}
+
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void saveFile(Socket clienteSocket) throws IOException {
+		DataInputStream dis = new DataInputStream(clienteSocket.getInputStream());
+		FileOutputStream fos = new FileOutputStream("");
+		byte[] buffer = new byte[4096];
+
+		int filesize = 15123; // Send file size in separate msg
+		int read = 0;
+		int totalRead = 0;
+		int remaining = filesize;
+		while ((read = dis.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
+			totalRead += read;
+			remaining -= read;
+			System.out.println("read " + totalRead + " bytes.");
+			fos.write(buffer, 0, read);
+		}
+
+		fos.close();
+		dis.close();
 	}
 }

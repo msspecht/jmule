@@ -68,7 +68,7 @@ public class ServerController {
 				// Recebimento de Objeto
 				ObjectInputStream recebeObjeto = new ObjectInputStream(clienteSocket.getInputStream());
 				ObjectOutputStream enviaObjeto = new ObjectOutputStream(clienteSocket.getOutputStream());
-
+				
 				Thread t = new ClientHandler(clienteSocket, recebeObjeto, enviaObjeto, this);
 
 				t.start();
