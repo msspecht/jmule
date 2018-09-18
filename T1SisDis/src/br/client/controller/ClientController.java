@@ -177,7 +177,7 @@ public class ClientController {
 		br.model.File newFile = null;
 		String digest = "";
 		
-		File file = new File(".//files//");
+		File file = new File("files");
 		File afile[] = file.listFiles();
 		
 		for (File arquivo : afile) {
