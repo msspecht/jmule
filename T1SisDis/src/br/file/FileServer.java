@@ -1,11 +1,19 @@
 package br.file;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
+
+import br.client.model.Client;
+import br.model.File;
 
 public class FileServer extends Thread {
 
@@ -24,31 +32,39 @@ public class FileServer extends Thread {
 		while (true) {
 			try {
 				Socket clientSock = ss.accept();
-				System.out.println("Files Server Aguardando conexao");
-				saveFile(clientSock);
+				sendFile(clientSock);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-
-	private void saveFile(Socket clientSock) throws IOException {
-		DataInputStream dis = new DataInputStream(clientSock.getInputStream());
-		FileOutputStream fos = new FileOutputStream(".//files//recebido"+date.getTime()+".txt");
-		byte[] buffer = new byte[4096];
-
-		int filesize = 15123; // Send file size in separate msg
-		int read = 0;
-		int totalRead = 0;
-		int remaining = filesize;
-		while ((read = dis.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
-			totalRead += read;
-			remaining -= read;
-			System.out.println("Arquivo Transferido");
-			fos.write(buffer, 0, read);
+	
+	public void sendFile(Socket clientSock) throws IOException {
+		ObjectInputStream dos = new ObjectInputStream(clientSock.getInputStream());
+		DataOutputStream outStreamSendClient = new DataOutputStream(clientSock.getOutputStream());
+		FileInputStream fis = null;
+		
+		Client client;
+		try {
+			
+			client = (Client) dos.readObject();
+			
+			for(File f: client.getListFiles()) {
+				fis = new FileInputStream(f.getCaminho());
+				byte[] buffer = new byte[4096];
+				
+				while (fis.read(buffer) > 0) {
+					outStreamSendClient.write(buffer);
+				}
+			}
+			
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			dos.close();
 		}
-
-		fos.close();
-		dis.close();
+		
+		fis.close();
+		dos.close();
+		outStreamSendClient.close();
 	}
 }

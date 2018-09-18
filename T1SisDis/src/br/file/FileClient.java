@@ -1,33 +1,51 @@
 package br.file;
 
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
+import java.io.DataInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Date;
+
+import br.client.model.Client;
 
 public class FileClient {
 	
 	private Socket s;
+	Date date = new Date();
 	
-	public FileClient(String host, int port, String file) {
+	public FileClient(String host, int port, Client client) {
 		try {
 			s = new Socket(host, port);
-			sendFile(file);
+			saveFile(client);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
 	}
 	
-	public void sendFile(String file) throws IOException {
-		DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-		FileInputStream fis = new FileInputStream(file);
+	
+	private void saveFile(Client client) throws IOException {
+		ObjectOutputStream dos = new ObjectOutputStream(s.getOutputStream());
+		dos.writeObject(client);
+		dos.flush();
+		dos.reset();
+		
+		DataInputStream dis = new DataInputStream(s.getInputStream());
+		FileOutputStream fos = new FileOutputStream("files//download"+client.getIp());
 		byte[] buffer = new byte[4096];
-		
-		while (fis.read(buffer) > 0) {
-			dos.write(buffer);
+
+		int filesize = 15123; // Send file size in separate msg
+		int read = 0;
+		int totalRead = 0;
+		int remaining = filesize;
+		while ((read = dis.read(buffer, 0, Math.min(buffer.length, remaining))) > 0) {
+			totalRead += read;
+			remaining -= read;
+			System.out.println("Arquivo Transferido");
+			fos.write(buffer, 0, read);
 		}
-		
-		fis.close();
-		dos.close();	
+
+		fos.close();
+		dis.close();
 	}
 }

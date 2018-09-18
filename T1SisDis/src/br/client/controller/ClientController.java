@@ -120,7 +120,8 @@ public class ClientController {
 						
 						map = (Map<String, Client>) objetoClient;
 						if (map.get(clientId) != null) {
-							fileClient = new FileClient(map.get(clientId).getIp(), TRANSFER_PORT, map.get(clientId).getListFiles().get(posicaoArquivo).getCaminho());
+//							fileClient = new FileClient(clientId, TRANSFER_PORT, map.get("172.17.0.18"));
+							fileClient = new FileClient(clientId, TRANSFER_PORT, map.get(clientId));
 						} else {
 							System.out.println("Client nao encontrado");
 						}
