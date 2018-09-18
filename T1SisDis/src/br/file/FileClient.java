@@ -28,10 +28,10 @@ public class FileClient {
 		ObjectOutputStream dos = new ObjectOutputStream(s.getOutputStream());
 		dos.writeObject(client);
 		dos.flush();
-		dos.reset();
+//		dos.reset();
 		
 		DataInputStream dis = new DataInputStream(s.getInputStream());
-		FileOutputStream fos = new FileOutputStream("files//download"+client.getIp());
+		FileOutputStream fos = new FileOutputStream("files//download"+client.getIp()+date.getTime()+".txt");
 		byte[] buffer = new byte[4096];
 
 		int filesize = 15123; // Send file size in separate msg
