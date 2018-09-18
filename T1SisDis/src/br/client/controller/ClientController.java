@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
@@ -63,7 +62,7 @@ public class ClientController {
 			int countFile = 0;
 			Map<String, Client> map;
 			
-			enviaObjeto.writeObject(createClient());
+			enviaObjeto.writeObject(createClient(socket.getLocalAddress().getHostAddress()));
 			enviaObjeto.flush();
 			enviaObjeto.reset();
 			
@@ -163,10 +162,10 @@ public class ClientController {
 
 	}
 	
-	public Client createClient() throws NoSuchAlgorithmException, IOException {
+	public Client createClient(String ip) throws NoSuchAlgorithmException, IOException {
 		Client newClient = new Client();
 		
-		newClient.setIp(InetAddress.getLocalHost().getHostAddress());
+		newClient.setIp(ip);
 		newClient.setListFiles(showResouces());
 		
 		return newClient;

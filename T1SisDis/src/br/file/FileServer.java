@@ -5,10 +5,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
 
 public class FileServer extends Thread {
 
 	private ServerSocket ss;
+	Date date = new Date();
 
 	public FileServer(int port) {
 		try {
@@ -32,7 +34,7 @@ public class FileServer extends Thread {
 
 	private void saveFile(Socket clientSock) throws IOException {
 		DataInputStream dis = new DataInputStream(clientSock.getInputStream());
-		FileOutputStream fos = new FileOutputStream(".//files//recebido.txt");
+		FileOutputStream fos = new FileOutputStream(".//files//recebido"+date.getTime()+".txt");
 		byte[] buffer = new byte[4096];
 
 		int filesize = 15123; // Send file size in separate msg
